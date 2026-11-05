@@ -24,7 +24,8 @@ import com.grihail.modernposes.net.SPose;
 /**
  * Client pose logic, ported from the modern player:
  * <ul>
- * <li>wanted pose: swim while sprint-swimming, sneak while holding sneak (not when flying), a low "sprint" pose while
+ * <li>wanted pose: what a {@link com.grihail.modernposes.api.PoseTrigger} asks for (gliding), else swim while
+ * sprint-swimming, sneak while holding sneak (not when flying), a low "sprint" pose while
  * sprinting if the set has one, else stand;</li>
  * <li>if the wanted box does not fit, the set's fallback list is tried (stand, sneak, crawl): a 1.5..1.8 gap
  * forces sneaking, a lower one crawling;</li>
@@ -48,6 +49,15 @@ public final class ClientPoses {
             s.prevSwimAmount = s.swimAmount;
             boolean lying = s.pose != null && s.pose.isHorizontal();
             s.swimAmount = lying ? Math.min(1F, s.swimAmount + SWIM_BLEND) : Math.max(0F, s.swimAmount - SWIM_BLEND);
+            s.flyTicks = s.pose != null && s.pose.isFallFlying() ? s.flyTicks + 1 : 0;
+            Entity e = mc.theWorld == null ? null : mc.theWorld.getEntityByID(en.getKey());
+            s.prevMoveX = s.moveX;
+            s.prevMoveY = s.moveY;
+            s.prevMoveZ = s.moveZ;
+            // this tick's movement (the entities have moved already); other players' motion fields stay 0
+            s.moveX = e == null ? 0 : e.posX - e.lastTickPosX;
+            s.moveY = e == null ? 0 : e.posY - e.lastTickPosY;
+            s.moveZ = e == null ? 0 : e.posZ - e.lastTickPosZ;
         }
         EntityPlayerSP p = mc.thePlayer;
         PoseState s = PoseState.get(p);
@@ -126,6 +136,8 @@ public final class ClientPoses {
     }
 
     private static String wantedPose(EntityPlayerSP p, PoseState s, PoseSet set) {
+        String triggered = ModernPoses.triggeredPose(p, set); // other mods first (elytra: fall_flying)
+        if (triggered != null) return triggered;
         if (s.swimming) return "swim";
         if (p.isSneaking() && !p.capabilities.isFlying && !p.isRiding() && set.poses.containsKey("sneak"))
             return "sneak";

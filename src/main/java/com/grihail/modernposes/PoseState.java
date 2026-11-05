@@ -24,6 +24,10 @@ public final class PoseState {
     public boolean swimming;
     /** 0..1 blend into the lying (swim / crawl) render pose, like modern swimAmount. */
     public float swimAmount, prevSwimAmount;
+    /** Ticks in the gliding pose (0 when not gliding), like modern fallFlyTicks. */
+    public int flyTicks;
+    /** Movement of the last tick and of the one before (blocks), for the gliding body's turn and limb speed. */
+    public double moveX, moveY, moveZ, prevMoveX, prevMoveY, prevMoveZ;
     /** Own player: smoothed eye height for the camera (NaN = not initialized). */
     public float eye = Float.NaN, prevEye = Float.NaN;
     /** Own player: ticks to wait before asking the server for a pose again after a rejection. */
@@ -50,6 +54,12 @@ public final class PoseState {
 
     public static PoseState getOrCreate(boolean client, int entityId) {
         return map(client).computeIfAbsent(entityId, k -> new PoseState());
+    }
+
+    /** 26.3's AvatarRenderState.fallFlyingScale. */
+    public float flyAmount(float partial) {
+        float t = flyTicks + partial;
+        return Math.max(0F, Math.min(1F, t * t / 100.0F));
     }
 
     public float swimAmount(float partial) {

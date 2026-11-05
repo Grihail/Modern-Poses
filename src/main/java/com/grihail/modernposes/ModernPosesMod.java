@@ -10,7 +10,9 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 
 /**
  * Modern player poses for 1.7.10: sneaking 1.5 high, swimming and crawling 0.6 high, sprint-swimming, sneaking or
- * crawling forced by a low ceiling, modern water movement, the camera at the pose's eye and the lying player model.
+ * crawling forced by a low ceiling, modern water movement, the camera at the pose's eye and the lying player model;
+ * the gliding pose (fall flying) when another mod's {@link com.grihail.modernposes.api.PoseTrigger} asks for it
+ * (elytra).
  * Other mods give their own pose sizes through {@link com.grihail.modernposes.api.ModernPoses}.
  */
 @Mod(

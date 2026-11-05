@@ -7,6 +7,7 @@ import net.minecraft.client.model.ModelBiped;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.Vec3;
 
 import org.lwjgl.opengl.GL11;
 
@@ -20,7 +21,9 @@ import com.grihail.modernposes.PoseState;
  * <li>sneaking: legs on the ground, body leaned, head down inside the 1.5 high box (1.7.10 lifts the legs instead and
  * lowers the whole player);</li>
  * <li>swimming / crawling: the stroke (arms sweep forward over the head, out to the sides and back, a 26-step cycle
- * over limbSwing, legs flutter) and the body turned to lie (after RenderPlayer.rotateCorpse).</li>
+ * over limbSwing, legs flutter) and the body turned to lie (after RenderPlayer.rotateCorpse);</li>
+ * <li>gliding (26.3's fall flying): the body along the flight (tilted by the pitch, turned toward the movement), the
+ * head up at 45 degrees, arms and legs swinging the less the faster the flight (HumanoidModel, AvatarRenderer).</li>
  * </ul>
  */
 public final class BipedPose {
@@ -44,7 +47,26 @@ public final class BipedPose {
         PoseState s = PoseState.get(e);
         if (s == null) return;
         sneak(m);
+        if (s.pose != null && s.pose.isFallFlying()) {
+            // HumanoidModel.setupAnim: the head looks forward along the flight whatever the pitch
+            m.bipedHead.rotateAngleX = -PI / 4F;
+            m.bipedHeadwear.rotateAngleX = m.bipedHead.rotateAngleX;
+            return; // 26.3 draws no stroke while gliding (swimAmount only grows when visually swimming)
+        }
         applySwim(m, limbSwing, s);
+    }
+
+    /**
+     * setRotationAngles' limb swing amount: 26.3 divides the swing of arms and legs by speedValue, which while gliding
+     * is (speed^2 / 0.2)^3, at least 1 (HumanoidMobRenderer), so a fast flight keeps the limbs still.
+     */
+    public static float limbAmount(Entity e, float amount) {
+        if (firstPerson || !(e instanceof EntityPlayer)) return amount;
+        PoseState s = PoseState.get(e);
+        if (s == null || s.pose == null || !s.pose.isFallFlying()) return amount;
+        float speed = (float) (s.moveX * s.moveX + s.moveY * s.moveY + s.moveZ * s.moveZ) / 0.2F;
+        speed = speed * speed * speed;
+        return speed < 1.0F ? amount : amount / speed;
     }
 
     /** Players whose sneak model is drawn by {@link #sneak} (on the ground, no vanilla 0.125 lowering). */
@@ -114,12 +136,36 @@ public final class BipedPose {
     public static void rotateCorpse(EntityPlayer p, float partial) {
         PoseState s = PoseState.get(p);
         if (s == null || p.isPlayerSleeping()) return;
+        if (s.pose != null && s.pose.isFallFlying()) {
+            flightRotation(p, s, partial);
+            return;
+        }
         float a = s.swimAmount(partial);
         if (a <= 0F) return;
         float pitch = p.prevRotationPitch + (p.rotationPitch - p.prevRotationPitch) * partial;
         float target = p.isInWater() ? -90.0F - pitch : -90.0F;
         GL11.glRotatef(a * target, 1.0F, 0.0F, 0.0F);
         GL11.glTranslatef(0.0F, -a, 0.3F * a);
+    }
+
+    /**
+     * AvatarRenderer.setupRotations while fall flying: tilted forward by scale * (-90 - pitch), then turned about the
+     * body's up axis by the angle between the horizontal movement and the horizontal look (signed), so a turning
+     * glider banks into the turn. The movement is the last two ticks' (lerped), as 26.3's deltaMovement.
+     */
+    private static void flightRotation(EntityPlayer p, PoseState s, float partial) {
+        float pitch = p.prevRotationPitch + (p.rotationPitch - p.prevRotationPitch) * partial;
+        GL11.glRotatef(s.flyAmount(partial) * (-90.0F - pitch), 1.0F, 0.0F, 0.0F);
+        Vec3 look = p.getLook(partial);
+        double mx = s.prevMoveX + (s.moveX - s.prevMoveX) * partial;
+        double mz = s.prevMoveZ + (s.moveZ - s.prevMoveZ) * partial;
+        double moveSq = mx * mx + mz * mz, lookSq = look.xCoord * look.xCoord + look.zCoord * look.zCoord;
+        if (moveSq > 1.0E-5F && lookSq > 1.0E-5F) {
+            double dot = (mx * look.xCoord + mz * look.zCoord) / Math.sqrt(moveSq * lookSq);
+            double sign = mx * look.zCoord - mz * look.xCoord;
+            double yRot = Math.signum(sign) * Math.acos(Math.min(1.0, Math.abs(dot)));
+            GL11.glRotatef((float) Math.toDegrees(yRot), 0.0F, 1.0F, 0.0F);
+        }
     }
 
     private static float stroke(float t) {

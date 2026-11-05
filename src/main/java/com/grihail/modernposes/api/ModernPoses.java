@@ -13,17 +13,33 @@ import com.grihail.modernposes.server.ServerPoses;
 
 /**
  * Entry points for other mods. Modern Poses owns the player's hitbox and eye height: the pose (stand, sneak, swim,
- * crawl...) is decided by the own client and checked by the server; a {@link PoseProvider} may change the sizes.
+ * crawl, fall_flying...) is decided by the own client and checked by the server; a {@link PoseProvider} may change the
+ * sizes, a {@link PoseTrigger} may ask for a pose (gliding on elytra).
  */
 public final class ModernPoses {
 
     private static final List<PoseProvider> PROVIDERS = new CopyOnWriteArrayList<>();
+    private static final List<PoseTrigger> TRIGGERS = new CopyOnWriteArrayList<>();
 
     private ModernPoses() {}
 
     /** Adds a provider of pose sizes (call during init). */
     public static void register(PoseProvider provider) {
         PROVIDERS.add(provider);
+    }
+
+    /** Adds a trigger of wanted poses (call during init); asked in the order of registration. */
+    public static void registerTrigger(PoseTrigger trigger) {
+        TRIGGERS.add(trigger);
+    }
+
+    /** Client, own player: the first pose of {@code set} a trigger asks for, or null. Used by Modern Poses itself. */
+    public static String triggeredPose(EntityPlayer p, PoseSet set) {
+        for (PoseTrigger t : TRIGGERS) {
+            String name = t.wantedPose(p);
+            if (name != null && set.poses.containsKey(name)) return name;
+        }
+        return null;
     }
 
     /** The poses of a player on its logical side. */
@@ -65,6 +81,21 @@ public final class ModernPoses {
     public static boolean isLying(Entity e) {
         PoseSize p = pose(e);
         return p != null && p.isHorizontal();
+    }
+
+    /** In the gliding pose ({@link PoseSet#FALL_FLYING}). Known on both sides, for every player. */
+    public static boolean isFallFlying(Entity e) {
+        PoseSize p = pose(e);
+        return p != null && p.isFallFlying();
+    }
+
+    /**
+     * Client: 0..1 blend into the gliding render pose, 26.3's fallFlyingScale: (ticks gliding)^2 / 100, so the body
+     * turns into the flight over the first 10 ticks. 0 when not gliding.
+     */
+    public static float fallFlyingAmount(Entity e, float partial) {
+        PoseState s = PoseState.get(e);
+        return s == null || !isFallFlying(e) ? 0F : s.flyAmount(partial);
     }
 
     /** Client: 0..1 blend into the lying render pose (like modern swimAmount). */

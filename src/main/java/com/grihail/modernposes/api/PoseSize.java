@@ -26,6 +26,11 @@ public final class PoseSize {
         return "swim".equals(name) || "crawl".equals(name);
     }
 
+    /** The gliding pose (drawn by its own rules, not lying like swim / crawl). */
+    public boolean isFallFlying() {
+        return PoseSet.FALL_FLYING.equals(name);
+    }
+
     @Override
     public String toString() {
         return name + " " + width + "x" + height + " eye " + eye;
