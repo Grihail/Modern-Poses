@@ -1,0 +1,22 @@
+{
+  "required": true,
+  "minVersion": "0.8.5-GTNH",
+  "package": "com.grihail.modernposes.mixins",
+  "refmap": "mixins.modernposes.refmap.json",
+  "target": "@env(DEFAULT)",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "MixinEntity",
+    "MixinEntityPlayer",
+    "MixinNetHandlerPlayServer"
+  ],
+  "client": [
+    "client.MixinEntityPlayerSP",
+    "client.MixinEntityRenderer",
+    "client.MixinModelBiped",
+    "client.MixinNetHandlerPlayClient",
+    "client.MixinPlayerControllerMP",
+    "client.MixinRenderPlayer"
+  ],
+  "server": []
+}
