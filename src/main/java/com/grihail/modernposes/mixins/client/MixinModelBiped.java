@@ -14,6 +14,13 @@ import com.grihail.modernposes.client.BipedPose;
 @Mixin(ModelBiped.class)
 public abstract class MixinModelBiped {
 
+    /** Before vanilla's angles: what the left arm holds, and an off hand's swing kept from the right arm. */
+    @Inject(method = "setRotationAngles", at = @At("HEAD"))
+    private void modernposes$before(float limbSwing, float limbAmount, float age, float headYaw, float pitch,
+        float scale, Entity entity, CallbackInfo ci) {
+        BipedPose.beforeAngles((ModelBiped) (Object) this, entity);
+    }
+
     /** Gliding: the swing of arms and legs shrinks with the flight's speed (26.3's speedValue). */
     @ModifyVariable(method = "setRotationAngles", at = @At("HEAD"), ordinal = 1, argsOnly = true)
     private float modernposes$limbAmount(float amount, float limbSwing, float limbAmount, float age, float headYaw,
@@ -25,6 +32,6 @@ public abstract class MixinModelBiped {
     @Inject(method = "setRotationAngles", at = @At("TAIL"))
     private void modernposes$pose(float limbSwing, float limbAmount, float age, float headYaw, float pitch, float scale,
         Entity entity, CallbackInfo ci) {
-        BipedPose.afterSetRotationAngles((ModelBiped) (Object) this, limbSwing, entity);
+        BipedPose.afterSetRotationAngles((ModelBiped) (Object) this, limbSwing, limbAmount, age, entity);
     }
 }

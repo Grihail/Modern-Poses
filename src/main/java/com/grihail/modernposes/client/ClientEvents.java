@@ -5,9 +5,11 @@ import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.RenderPlayerEvent;
 
 import com.grihail.modernposes.PoseState;
 import com.grihail.modernposes.Sizes;
+import com.grihail.modernposes.api.ModernHands;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
@@ -29,8 +31,17 @@ public final class ClientEvents {
             EntityPlayer p = (EntityPlayer) o;
             PoseState s = PoseState.get(p);
             if (s != null && s.pose != null) Sizes.apply(p, s.pose);
+            HandClient.tick(p);
         }
         if (!mc.isGamePaused()) ClientPoses.tick(mc);
+    }
+
+    /** An item drawn as a model is drawn by HandRender, at 26.3's place. */
+    @SubscribeEvent
+    public void onSpecials(RenderPlayerEvent.Specials.Pre e) {
+        if (ModernHands.heldModel(e.entityPlayer.inventory.getCurrentItem()) != null) {
+            e.renderItem = false;
+        }
     }
 
     /** F3 screen: pose and water movement numbers (to diagnose swimming problems). */

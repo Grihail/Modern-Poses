@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import net.minecraft.client.model.ModelBiped;
+import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
@@ -12,6 +13,11 @@ import net.minecraft.util.Vec3;
 import org.lwjgl.opengl.GL11;
 
 import com.grihail.modernposes.PoseState;
+import com.grihail.modernposes.api.ArmAngles;
+import com.grihail.modernposes.api.ArmPose;
+import com.grihail.modernposes.api.Hand;
+import com.grihail.modernposes.api.ModernHands;
+import com.grihail.modernposes.hands.Hands;
 
 /**
  * The player model in modern poses, applied on top of vanilla angles in ModelBiped.setRotationAngles. Every
@@ -42,8 +48,66 @@ public final class BipedPose {
 
     private BipedPose() {}
 
-    public static void afterSetRotationAngles(ModelBiped m, float limbSwing, Entity e) {
+    /** The swing kept from vanilla's right arm: it is the off hand's. */
+    private static float offSwing;
+
+    /** Before vanilla's angles: the left arm holds the off hand's item; the right arm does not take its swing. */
+    public static void beforeAngles(ModelBiped m, Entity e) {
+        offSwing = 0.0F;
         if (firstPerson || !(e instanceof EntityPlayer)) return;
+        EntityPlayer p = (EntityPlayer) e;
+        ArmPose off = ModernHands.armPose(p, Hand.OFF);
+        m.heldItemLeft = off == ArmPose.EMPTY ? 0 : off == ArmPose.SWORD_BLOCK ? 3 : 1;
+        if (m.onGround > 0.0F && Hands.of(p).swingOff) {
+            offSwing = m.onGround;
+            m.onGround = 0.0F;
+        }
+    }
+
+    /** 26.3's arm poses on top of vanilla's (HumanoidModel.poseRightArm, poseLeftArm, setupAttackAnimation). */
+    private static void arms(ModelBiped m, EntityPlayer p, float limbSwing, float limbAmount, float age) {
+        float headX = m.bipedHead.rotateAngleX, headY = m.bipedHead.rotateAngleY;
+        if (ModernHands.armPose(p, Hand.MAIN) == ArmPose.BLOCK)
+            raise(m, m.bipedRightArm, true, limbSwing, limbAmount, age);
+        ArmPose off = ModernHands.armPose(p, Hand.OFF);
+        if (off == ArmPose.BLOCK) raise(m, m.bipedLeftArm, false, limbSwing, limbAmount, age);
+        if (off == ArmPose.BOW_AND_ARROW) {
+            float[] a = ArmAngles.bowAim(headX, headY, true);
+            m.bipedRightArm.rotateAngleY = a[0];
+            m.bipedLeftArm.rotateAngleY = a[1];
+            m.bipedRightArm.rotateAngleX = m.bipedLeftArm.rotateAngleX = a[2];
+        }
+        if (offSwing > 0.0F) {
+            float[] s = ArmAngles.swing(offSwing, headX, true);
+            m.bipedBody.rotateAngleY = s[0];
+            float sin = MathHelper.sin(s[0]) * 5.0F, cos = MathHelper.cos(s[0]) * 5.0F;
+            m.bipedRightArm.rotationPointZ = sin;
+            m.bipedRightArm.rotationPointX = -cos;
+            m.bipedLeftArm.rotationPointZ = -sin;
+            m.bipedLeftArm.rotationPointX = cos;
+            m.bipedRightArm.rotateAngleY += s[0];
+            m.bipedLeftArm.rotateAngleY += s[0];
+            m.bipedLeftArm.rotateAngleX += s[0] + s[1];
+            m.bipedLeftArm.rotateAngleY += s[2];
+            m.bipedLeftArm.rotateAngleZ += s[3];
+            m.onGround = offSwing;
+        }
+    }
+
+    /** An arm raised by a shield: from its walking swing, not from what vanilla's item pose made of it. */
+    private static void raise(ModelBiped m, ModelRenderer arm, boolean right, float limbSwing, float limbAmount,
+        float age) {
+        float base = MathHelper.cos(limbSwing * 0.6662F + (right ? PI : 0.0F)) * limbAmount;
+        if (m.isRiding) base -= PI / 5.0F;
+        float[] a = ArmAngles.blocking(base, m.bipedHead.rotateAngleX, m.bipedHead.rotateAngleY, right);
+        arm.rotateAngleX = a[0] + (m.isSneak ? 0.4F : 0.0F)
+            + (right ? 1.0F : -1.0F) * MathHelper.sin(age * 0.067F) * 0.05F;
+        arm.rotateAngleY = a[1];
+    }
+
+    public static void afterSetRotationAngles(ModelBiped m, float limbSwing, float limbAmount, float age, Entity e) {
+        if (firstPerson || !(e instanceof EntityPlayer)) return;
+        arms(m, (EntityPlayer) e, limbSwing, limbAmount, age);
         PoseState s = PoseState.get(e);
         if (s == null) return;
         sneak(m);

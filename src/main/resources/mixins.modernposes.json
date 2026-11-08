@@ -8,7 +8,11 @@
   "mixins": [
     "MixinEntity",
     "MixinEntityPlayer",
-    "MixinNetHandlerPlayServer"
+    "MixinNetHandlerPlayServer",
+    "AccessorC08",
+    "AccessorEntityPlayer",
+    "MixinContainerPlayer",
+    "MixinInventoryPlayer"
   ],
   "client": [
     "client.MixinEffectRenderer",
@@ -17,7 +21,13 @@
     "client.MixinModelBiped",
     "client.MixinNetHandlerPlayClient",
     "client.MixinPlayerControllerMP",
-    "client.MixinRenderPlayer"
+    "client.MixinRenderPlayer",
+    "client.AccessorItemRenderer",
+    "client.MixinItemRenderer",
+    "client.MixinMinecraft",
+    "client.MixinEntityOtherPlayerMP",
+    "client.MixinGuiInventory",
+    "client.MixinGuiContainerCreative"
   ],
   "server": []
 }

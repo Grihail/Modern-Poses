@@ -3,7 +3,7 @@
 	"modList": [{
 		"modid": "${modId}",
 		"name": "${modName}",
-		"description": "Modern player poses: sneaking 1.5 blocks high, swimming and crawling, sprint-swimming, a low ceiling forces sneaking or crawling, gliding (fall flying) for mods with elytra. Other mods can give their own pose sizes and ask for poses.",
+		"description": "Modern player poses: sneaking 1.5 blocks high, swimming and crawling, sprint-swimming, a low ceiling forces sneaking or crawling, gliding (fall flying) for mods with elytra, a second hand and the arm movements of 26.3. Other mods can give their own pose sizes, ask for poses and use the hands.",
 		"version": "${modVersion}",
 		"mcversion": "${minecraftVersion}",
 		"url": "",

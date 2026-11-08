@@ -1,10 +1,12 @@
 package com.grihail.modernposes.mixins.client;
 
 import net.minecraft.client.entity.AbstractClientPlayer;
+import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.entity.player.EntityPlayer;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -12,9 +14,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.grihail.modernposes.client.BipedPose;
 import com.grihail.modernposes.client.ClientPoses;
+import com.grihail.modernposes.client.HandRender;
+import com.grihail.modernposes.hands.Hands;
 
 @Mixin(RenderPlayer.class)
 public abstract class MixinRenderPlayer {
+
+    @Shadow
+    public ModelBiped modelBipedMain;
 
     @Inject(method = "doRender(Lnet/minecraft/client/entity/AbstractClientPlayer;DDDFF)V", at = @At("HEAD"))
     private void modernposes$partial(AbstractClientPlayer player, double x, double y, double z, float yaw,
@@ -45,6 +52,22 @@ public abstract class MixinRenderPlayer {
             ordinal = 1))
     private boolean modernposes$lowerSneaking(AbstractClientPlayer player) {
         return !BipedPose.groundedSneak(player) && player.isSneaking();
+    }
+
+    /** An item in use in the off hand is not the main hand's. */
+    @Redirect(
+        method = { "doRender(Lnet/minecraft/client/entity/AbstractClientPlayer;DDDFF)V",
+            "renderEquippedItems(Lnet/minecraft/client/entity/AbstractClientPlayer;F)V" },
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/AbstractClientPlayer;getItemInUseCount()I"))
+    private int modernposes$mainUse(AbstractClientPlayer player) {
+        return Hands.of(player)
+            .usedOff() ? 0 : player.getItemInUseCount();
+    }
+
+    /** The off hand's item, and items drawn as models. */
+    @Inject(method = "renderEquippedItems(Lnet/minecraft/client/entity/AbstractClientPlayer;F)V", at = @At("TAIL"))
+    private void modernposes$hands(AbstractClientPlayer player, float partialTicks, CallbackInfo ci) {
+        HandRender.afterEquipped(player, this.modelBipedMain, partialTicks);
     }
 
     @Inject(method = "rotateCorpse(Lnet/minecraft/client/entity/AbstractClientPlayer;FFF)V", at = @At("TAIL"))

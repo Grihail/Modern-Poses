@@ -15,5 +15,8 @@ public final class PoseNet {
     public static void init() {
         NET.registerMessage(SPose.Handler.class, SPose.class, 0, Side.CLIENT);
         NET.registerMessage(CPose.Handler.class, CPose.class, 1, Side.SERVER);
+        NET.registerMessage(SHands.Handler.class, SHands.class, 2, Side.CLIENT);
+        NET.registerMessage(SSwingOff.Handler.class, SSwingOff.class, 3, Side.CLIENT);
+        NET.registerMessage(CSwapHands.Handler.class, CSwapHands.class, 4, Side.SERVER);
     }
 }
