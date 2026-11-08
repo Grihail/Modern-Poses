@@ -11,6 +11,7 @@
     "MixinNetHandlerPlayServer"
   ],
   "client": [
+    "client.MixinEffectRenderer",
     "client.MixinEntityPlayerSP",
     "client.MixinEntityRenderer",
     "client.MixinModelBiped",
