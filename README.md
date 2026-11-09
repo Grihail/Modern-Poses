@@ -63,7 +63,7 @@
 
 ## Сборка
 
-`gradlew build` (JDK 17+), jar — `build/libs/modernposes-<версия>.jar`; `-dev.jar` — для разработки зависимых модов,
-`-api.jar` — только API. Версия — из git-тега.
+`gradlew build` (JDK 17+), jar — `build/libs/modern-poses-<версия>.jar`; `-dev.jar` — для разработки зависимых модов,
+`-api.jar` — только API. Версия в имени файла — последний git-тег.
 
 Зависимые моды: Incarnate и back-to-future (обязательно).
