@@ -19,6 +19,7 @@ public class CommonProxy {
     public void init(FMLInitializationEvent event) {
         register(new ServerPoses());
         register(new com.grihail.modernposes.hands.HandsServer());
+        register(new com.grihail.modernposes.combat.Combat());
     }
 
     protected static void register(Object events) {

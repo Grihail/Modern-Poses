@@ -1,5 +1,6 @@
 package com.grihail.modernposes.mixins;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
@@ -14,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.grihail.modernposes.ModernPosesMod;
 import com.grihail.modernposes.Sizes;
 import com.grihail.modernposes.api.RaisedBlockItem;
+import com.grihail.modernposes.combat.Combat;
 import com.grihail.modernposes.hands.HandUse;
 import com.grihail.modernposes.hands.Hands;
 
@@ -22,6 +24,20 @@ public abstract class MixinEntityPlayer {
 
     @Unique
     private boolean modernposes$finishOff;
+
+    /** Attributes.ATTACK_SPEED, on the base of 4. */
+    @Inject(method = "applyEntityAttributes", at = @At("TAIL"))
+    private void modernposes$attackSpeed(CallbackInfo ci) {
+        ((EntityPlayer) (Object) this).getAttributeMap()
+            .registerAttribute(Combat.ATTACK_SPEED);
+    }
+
+    /** 26.3's attack instead of 1.7.10's. */
+    @Inject(method = "attackTargetEntityWithCurrentItem", at = @At("HEAD"), cancellable = true)
+    private void modernposes$attack(Entity target, CallbackInfo ci) {
+        ci.cancel();
+        Combat.attack((EntityPlayer) (Object) this, target);
+    }
 
     /** The stack the item in use is compared with: the hand's that holds it. */
     @Redirect(
