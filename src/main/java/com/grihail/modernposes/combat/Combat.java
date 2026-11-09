@@ -27,9 +27,12 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 
 import com.grihail.modernposes.api.WeaponItem;
+import com.grihail.modernposes.net.PoseNet;
+import com.grihail.modernposes.net.SCombatFx;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
+import cpw.mods.fml.common.network.NetworkRegistry;
 
 /** 26.3's melee attack (Player.attack and what it calls) on 1.7.10's entities. */
 public final class Combat {
@@ -178,6 +181,9 @@ public final class Combat {
         if (living != null) {
             float dealt = oldHealth - living.getHealth();
             self.addStat(StatList.damageDealtStat, Math.round(dealt * 10.0F));
+            if (dealt > 2.0F) {
+                fx(self, SCombatFx.DAMAGE, target.posX, target.posY + target.height * 0.5D, target.posZ, (int) (dealt * 0.5D));
+            }
         }
         self.addExhaustion(0.1F);
     }
@@ -302,6 +308,14 @@ public final class Combat {
                 }
             }
         }
+        double dx = -MathHelper.sin(yaw), dz = MathHelper.cos(yaw);
+        fx(self, SCombatFx.SWEEP, self.posX + dx, self.posY + self.height * 0.5D, self.posZ + dz, 0);
+    }
+
+    private static void fx(EntityPlayer p, int kind, double x, double y, double z, int count) {
+        PoseNet.NET.sendToAllAround(
+            new SCombatFx(kind, x, y, z, count),
+            new NetworkRegistry.TargetPoint(p.dimension, x, y, z, 32.0D));
     }
 
     /** Player.itemAttackInteraction and the enchantments' post attack effects. */

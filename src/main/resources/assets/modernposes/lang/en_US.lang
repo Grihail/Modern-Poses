@@ -1,2 +1,10 @@
 key.modernposes.swapHands=Swap Item With Off Hand
 enchantment.modernposes.sweeping=Sweeping Edge
+item.modifiers.mainhand=When in Main Hand:
+item.modifiers.head=When on Head:
+item.modifiers.chest=When on Chest:
+item.modifiers.legs=When on Legs:
+item.modifiers.feet=When on Feet:
+attribute.name.generic.attackSpeed=Attack Speed
+attribute.name.generic.armor=Armor
+attribute.name.generic.armorToughness=Armor Toughness

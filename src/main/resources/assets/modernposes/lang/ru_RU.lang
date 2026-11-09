@@ -1,2 +1,10 @@
 key.modernposes.swapHands=Заменить предмет во второй руке
 enchantment.modernposes.sweeping=Разящий клинок
+item.modifiers.mainhand=Когда в ведущей руке:
+item.modifiers.head=Когда надето на голову:
+item.modifiers.chest=Когда надето:
+item.modifiers.legs=Когда надето на ноги:
+item.modifiers.feet=Когда обуто:
+attribute.name.generic.attackSpeed=Скорость атаки
+attribute.name.generic.armor=Броня
+attribute.name.generic.armorToughness=Твёрдость брони

@@ -5,11 +5,14 @@ import net.minecraft.client.renderer.ItemRenderer;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.grihail.modernposes.client.HandClient;
 import com.grihail.modernposes.client.HandRender;
+import com.grihail.modernposes.combat.Combat;
 
 /** Both hands in the first person. */
 @Mixin(ItemRenderer.class)
@@ -29,6 +32,13 @@ public abstract class MixinItemRenderer {
             HandRender.resetOffhand();
             ci.cancel();
         }
+    }
+
+    /** FirstPersonHandsAndItems.tick: the arm comes back up with the cube of the charge. */
+    @ModifyConstant(method = "updateEquippedItem", constant = @Constant(floatValue = 1.0F))
+    private float modernposes$armHeight(float vanilla) {
+        float scale = Combat.swapScale(Minecraft.getMinecraft().thePlayer, 1.0F);
+        return scale * scale * scale;
     }
 
     @Inject(method = "updateEquippedItem", at = @At("HEAD"))

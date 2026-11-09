@@ -19,5 +19,6 @@ public final class PoseNet {
         NET.registerMessage(SSwingOff.Handler.class, SSwingOff.class, 3, Side.CLIENT);
         NET.registerMessage(CSwapHands.Handler.class, CSwapHands.class, 4, Side.SERVER);
         NET.registerMessage(CPunch.Handler.class, CPunch.class, 5, Side.SERVER);
+        NET.registerMessage(SCombatFx.Handler.class, SCombatFx.class, 6, Side.CLIENT);
     }
 }

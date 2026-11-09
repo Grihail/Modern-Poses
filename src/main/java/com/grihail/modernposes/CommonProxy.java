@@ -13,6 +13,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 public class CommonProxy {
 
     public void preInit(FMLPreInitializationEvent event) {
+        com.grihail.modernposes.combat.CombatConfig.load(event.getSuggestedConfigurationFile());
         PoseNet.init();
         com.grihail.modernposes.combat.EnchantmentSweeping.register();
         com.grihail.modernposes.combat.Combat.registerPotions();

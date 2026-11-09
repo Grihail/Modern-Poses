@@ -21,6 +21,7 @@ public class ClientProxy extends CommonProxy {
         super.init(event);
         register(new ClientEvents());
         register(new HandClient());
+        register(new CombatHud());
         cpw.mods.fml.client.registry.ClientRegistry.registerKeyBinding(HandClient.SWAP);
     }
 
