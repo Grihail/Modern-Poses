@@ -22,4 +22,19 @@ public interface HeldModel {
      */
     void render(ItemStack stack, EntityLivingBase holder, boolean left, boolean firstPerson, boolean using,
         float partialTicks);
+
+    /**
+     * True if the model moves itself during the attack swing (a spear's stab), so the first person's ordinary swing is
+     * not applied; it reads the swing with {@link ModernHands#swingProgress}.
+     */
+    default boolean ownSwing(ItemStack stack) {
+        return false;
+    }
+
+    /**
+     * A {@link ScopeItem} in use, third person: drawn at the eye (PlayerItemInHandLayer.renderItemHeldToEye). The
+     * matrix is at the head, after CustomHeadLayer's translateToHead and 2.5 px to the hand's side: what is left is
+     * the model's head display transform and the model.
+     */
+    default void renderAtEye(ItemStack stack, EntityLivingBase holder, boolean left, float partialTicks) {}
 }

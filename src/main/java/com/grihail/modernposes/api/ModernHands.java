@@ -70,6 +70,12 @@ public final class ModernHands {
         if (stack == null) {
             return ArmPose.EMPTY;
         }
+        if (usedHand(p) == hand && stack.getItem() instanceof ScopeItem) {
+            return ArmPose.SPYGLASS;
+        }
+        if (stack.getItem() instanceof KineticItem) {
+            return ArmPose.SPEAR;
+        }
         if (usedHand(p) == hand) {
             EnumAction action = stack.getItemUseAction();
             if (action == EnumAction.block) {
@@ -80,6 +86,21 @@ public final class ModernHands {
             }
         }
         return ArmPose.ITEM;
+    }
+
+    /** Ticks the item in use has been used (with the frame's part), 0 when that hand uses nothing. */
+    public static float useTicks(EntityPlayer p, Hand hand, float partialTicks) {
+        if (usedHand(p) != hand || p.getItemInUse() == null) {
+            return 0.0F;
+        }
+        return p.getItemInUse()
+            .getMaxItemUseDuration() - p.getItemInUseCount()
+            + partialTicks;
+    }
+
+    /** The swing's progress 0..1 of a hand (0 when the other hand swings or none does). */
+    public static float swingProgress(EntityPlayer p, Hand hand, float partialTicks) {
+        return swingingHand(p) == hand ? p.getSwingProgress(partialTicks) : 0.0F;
     }
 
     /** Draws an item as a model when held (call during init on the client). */

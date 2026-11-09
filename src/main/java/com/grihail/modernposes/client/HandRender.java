@@ -27,6 +27,7 @@ import com.grihail.modernposes.api.Hand;
 import com.grihail.modernposes.api.HeldModel;
 import com.grihail.modernposes.api.ModernHands;
 import com.grihail.modernposes.api.RaisedBlockItem;
+import com.grihail.modernposes.api.ScopeItem;
 import com.grihail.modernposes.hands.Hands;
 import com.grihail.modernposes.mixins.AccessorEntityPlayer;
 import com.grihail.modernposes.mixins.client.AccessorItemRenderer;
@@ -50,6 +51,7 @@ public final class HandRender {
 
     /** RenderPlayer.renderEquippedItems, at its end. */
     public static void afterEquipped(EntityPlayer p, ModelBiped model, float partial) {
+        atEye(p, model, partial);
         if (ModernHands.heldModel(p.inventory.getCurrentItem()) != null) {
             GL11.glPushMatrix();
             model.bipedRightArm.postRender(0.0625F);
@@ -65,6 +67,30 @@ public final class HandRender {
         }
     }
 
+    /** PlayerItemInHandLayer.renderItemHeldToEye: a scope in use at the eye, the head's pitch kept to -30..90. */
+    private static void atEye(EntityPlayer p, ModelBiped model, float partial) {
+        Hand hand = ModernHands.usedHand(p);
+        ItemStack stack = hand == null ? null : ModernHands.getHeld(p, hand);
+        HeldModel held = ModernHands.heldModel(stack);
+        if (held == null || !(stack.getItem() instanceof ScopeItem)
+            || ModernHands.swingProgress(p, hand, partial) >= 1.0E-5F) {
+            return;
+        }
+        GL11.glPushMatrix();
+        float x = model.bipedHead.rotateAngleX;
+        model.bipedHead.rotateAngleX = Math.max((float) -Math.PI / 6.0F, Math.min((float) Math.PI / 2.0F, x));
+        model.bipedHead.postRender(0.0625F);
+        model.bipedHead.rotateAngleX = x;
+        // CustomHeadLayer.translateToHead: half a block up, the head's scale 0.625 turned to face out
+        GL11.glTranslatef(0.0F, -0.25F, 0.0F);
+        GL11.glRotatef(180.0F, 0.0F, 1.0F, 0.0F);
+        GL11.glScalef(0.625F, -0.625F, -0.625F);
+        boolean left = hand == Hand.OFF;
+        GL11.glTranslatef((left ? -2.5F : 2.5F) / 16.0F, -0.0625F, 0.0F);
+        held.renderAtEye(stack, p, left, partial);
+        GL11.glPopMatrix();
+    }
+
     /** What a hand holds, with the matrix at its arm's pivot. */
     public static void atArm(EntityPlayer p, Hand hand, float partial) {
         ItemStack stack = ModernHands.getHeld(p, hand);
@@ -74,6 +100,11 @@ public final class HandRender {
         boolean left = hand == Hand.OFF;
         boolean using = ModernHands.usedHand(p) == hand;
         HeldModel model = ModernHands.heldModel(stack);
+        if (model != null && using
+            && stack.getItem() instanceof ScopeItem
+            && ModernHands.swingProgress(p, hand, partial) < 1.0E-5F) {
+            return; // drawn at the eye (afterEquipped)
+        }
         if (model != null) {
             // 26.3's ItemInHandLayer
             GL11.glPushMatrix();
@@ -192,6 +223,10 @@ public final class HandRender {
         EntityClientPlayerMP p = mc.thePlayer;
         AccessorItemRenderer a = (AccessorItemRenderer) renderer;
         ItemStack main = a.modernposes$getItemToRender();
+        if (p.isUsingItem() && p.getItemInUse()
+            .getItem() instanceof ScopeItem) {
+            return true; // 26.3 draws no hands while looking through a scope
+        }
         HeldModel mainModel = ModernHands.heldModel(main);
         if (offShown == null && mainModel == null) {
             return false;
@@ -298,7 +333,7 @@ public final class HandRender {
         prologue(p, partial);
         float invert = left ? -1.0F : 1.0F;
         GL11.glTranslatef(invert * 0.56F, -0.52F + (1.0F - progress) * -0.6F, -0.72F);
-        if (!using) {
+        if (!using && !model.ownSwing(stack)) {
             float root = MathHelper.sqrt_float(attack);
             float pi = (float) Math.PI;
             GL11.glTranslatef(

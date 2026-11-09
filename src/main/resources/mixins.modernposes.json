@@ -12,7 +12,8 @@
     "AccessorC08",
     "AccessorEntityPlayer",
     "MixinContainerPlayer",
-    "MixinInventoryPlayer"
+    "MixinInventoryPlayer",
+    "MixinEntityLivingBase"
   ],
   "client": [
     "client.MixinEffectRenderer",

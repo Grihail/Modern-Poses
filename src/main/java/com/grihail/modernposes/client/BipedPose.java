@@ -7,6 +7,7 @@ import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 
@@ -16,7 +17,10 @@ import com.grihail.modernposes.PoseState;
 import com.grihail.modernposes.api.ArmAngles;
 import com.grihail.modernposes.api.ArmPose;
 import com.grihail.modernposes.api.Hand;
+import com.grihail.modernposes.api.KineticItem;
 import com.grihail.modernposes.api.ModernHands;
+import com.grihail.modernposes.api.SpearMotion;
+import com.grihail.modernposes.api.StabItem;
 import com.grihail.modernposes.hands.Hands;
 
 /**
@@ -50,12 +54,20 @@ public final class BipedPose {
 
     /** The swing kept from vanilla's right arm: it is the off hand's. */
     private static float offSwing;
+    /** The main hand's swing, kept from vanilla's arm because it is a stab. */
+    private static float stab;
 
     /** Before vanilla's angles: the left arm holds the off hand's item; the right arm does not take its swing. */
     public static void beforeAngles(ModelBiped m, Entity e) {
         offSwing = 0.0F;
+        stab = 0.0F;
         if (firstPerson || !(e instanceof EntityPlayer)) return;
         EntityPlayer p = (EntityPlayer) e;
+        ItemStack main = p.inventory.getCurrentItem();
+        if (m.onGround > 0.0F && !Hands.of(p).swingOff && main != null && main.getItem() instanceof StabItem) {
+            stab = m.onGround;
+            m.onGround = 0.0F;
+        }
         ArmPose off = ModernHands.armPose(p, Hand.OFF);
         m.heldItemLeft = off == ArmPose.EMPTY ? 0 : off == ArmPose.SWORD_BLOCK ? 3 : 1;
         if (m.onGround > 0.0F && Hands.of(p).swingOff) {
@@ -77,6 +89,42 @@ public final class BipedPose {
             m.bipedLeftArm.rotateAngleY = a[1];
             m.bipedRightArm.rotateAngleX = m.bipedLeftArm.rotateAngleX = a[2];
         }
+        boolean flyOrSwim = s(p);
+        for (Hand hand : Hand.values()) {
+            ArmPose pose = ModernHands.armPose(p, hand);
+            boolean right = hand == Hand.MAIN;
+            ModelRenderer arm = right ? m.bipedRightArm : m.bipedLeftArm;
+            if (pose == ArmPose.SPEAR) {
+                ItemStack stack = ModernHands.getHeld(p, hand);
+                float[] a = SpearMotion.holdingArm(
+                    headX,
+                    headY,
+                    right,
+                    flyOrSwim,
+                    (KineticItem) stack.getItem(),
+                    stack,
+                    ModernHands.useTicks(p, hand, partialTicks));
+                arm.rotateAngleX = a[0];
+                arm.rotateAngleY = a[1];
+                arm.rotateAngleZ = a[2];
+            } else if (pose == ArmPose.SPYGLASS) {
+                float[] a = ArmAngles.spyglass(headX, headY, m.isSneak, right);
+                arm.rotateAngleX = a[0];
+                arm.rotateAngleY = a[1];
+            }
+        }
+        if (stab > 0.0F) {
+            // HumanoidModel.setupAttackAnimation with SpearAnimations.thirdPersonAttackHand
+            float bodyY = MathHelper.sin(MathHelper.sqrt_float(stab) * PI * 2.0F) * 0.2F;
+            m.bipedBody.rotateAngleY = bodyY;
+            float sin = MathHelper.sin(bodyY) * 5.0F, cos = MathHelper.cos(bodyY) * 5.0F;
+            m.bipedRightArm.rotationPointZ = sin;
+            m.bipedRightArm.rotationPointX = -cos;
+            m.bipedLeftArm.rotationPointZ = -sin;
+            m.bipedLeftArm.rotationPointX = cos;
+            m.bipedRightArm.rotateAngleX += SpearMotion.stabArmX(stab);
+            m.onGround = stab;
+        }
         if (offSwing > 0.0F) {
             float[] s = ArmAngles.swing(offSwing, headX, true);
             m.bipedBody.rotateAngleY = s[0];
@@ -92,6 +140,12 @@ public final class BipedPose {
             m.bipedLeftArm.rotateAngleZ += s[3];
             m.onGround = offSwing;
         }
+    }
+
+    /** Gliding or lying in a swim (26.3's isFallFlying || swimAmount > 0). */
+    private static boolean s(EntityPlayer p) {
+        PoseState st = PoseState.get(p);
+        return st != null && (st.pose != null && st.pose.isFallFlying() || st.swimAmount(partialTicks) > 0.0F);
     }
 
     /** An arm raised by a shield: from its walking swing, not from what vanilla's item pose made of it. */

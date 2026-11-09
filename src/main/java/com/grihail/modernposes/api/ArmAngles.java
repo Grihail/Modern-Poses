@@ -53,6 +53,16 @@ public final class ArmAngles {
         return new float[] { bodyY, -(aa * 1.2F + bb), bodyY * 2.0F, sin(progress * PI) * -0.4F };
     }
 
+    /**
+     * The arm lifting a spyglass to the eye (HumanoidModel.poseRightArm / poseLeftArm: SPYGLASS).
+     *
+     * @return x and y rotation of the arm
+     */
+    public static float[] spyglass(float headX, float headY, boolean crouching, boolean rightArm) {
+        float x = clamp(headX - 1.9198622F - (crouching ? PI / 12.0F : 0.0F), -2.4F, 3.3F);
+        return new float[] { x, headY + (rightArm ? -PI / 12.0F : PI / 12.0F) };
+    }
+
     private static float sin(float a) {
         return (float) Math.sin(a);
     }

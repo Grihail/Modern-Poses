@@ -14,5 +14,9 @@ public enum ArmPose {
     /** Blocking the old way, with a sword held across the chest (1.7.10's EnumAction.block). */
     SWORD_BLOCK,
     /** Drawing a bow. See {@link ArmAngles#bowAim}. */
-    BOW_AND_ARROW
+    BOW_AND_ARROW,
+    /** Holding a {@link KineticItem} (a spear) forward, charging it while used. See {@link SpearMotion#holdingArm}. */
+    SPEAR,
+    /** Looking through a {@link ScopeItem} (a spyglass). See {@link ArmAngles#spyglass}. */
+    SPYGLASS
 }
