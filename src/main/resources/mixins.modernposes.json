@@ -19,7 +19,9 @@
     "MixinItemTool",
     "AccessorItemHoe",
     "MixinEnchantmentDamage",
-    "MixinPotionAttackDamage"
+    "MixinPotionAttackDamage",
+    "MixinFoodStats",
+    "MixinItemAppleGold"
   ],
   "client": [
     "client.MixinEffectRenderer",
