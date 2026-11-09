@@ -45,6 +45,14 @@ public final class Combat {
 
     private static final String SOUND = "modernposes:player.attack.";
 
+    /** MobEffects: Haste and Mining Fatigue change the attack speed, Strength becomes a flat bonus. */
+    public static void registerPotions() {
+        Potion.digSpeed.func_111184_a(ATTACK_SPEED, "AF8B6E3F-3328-4C0A-AA36-5BA2BB9DBEF3", 0.1D, 2);
+        Potion.digSlowdown.func_111184_a(ATTACK_SPEED, "55FCED67-E92A-486E-9800-B47F202C4386", -0.1D, 2);
+        Potion.damageBoost
+            .func_111184_a(SharedMonsterAttributes.attackDamage, "648D7064-6A60-4F59-8ABE-C2C23A6DD7A9", 3.0D, 0);
+    }
+
     // ------------------------------------------------------------------ the charge
 
     /** Player.getCurrentItemAttackStrengthDelay: ticks a full charge takes. */
@@ -275,7 +283,7 @@ public final class Combat {
     private static void sweep(EntityPlayer self, Entity target, float base, DamageSource source, float scale) {
         sound(self, "sweep");
         float yaw = self.rotationYaw * (float) Math.PI / 180.0F;
-        float damage = 1.0F;
+        float damage = 1.0F + EnchantmentSweeping.ratio(self.getCurrentEquippedItem()) * base;
         List<?> near = self.worldObj
             .getEntitiesWithinAABB(EntityLivingBase.class, target.boundingBox.expand(1.0D, 0.25D, 1.0D));
         for (Object o : near) {

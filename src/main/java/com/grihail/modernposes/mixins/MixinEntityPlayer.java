@@ -1,9 +1,11 @@
 package com.grihail.modernposes.mixins;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.DamageSource;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -15,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.grihail.modernposes.ModernPosesMod;
 import com.grihail.modernposes.Sizes;
 import com.grihail.modernposes.api.RaisedBlockItem;
+import com.grihail.modernposes.combat.ArmorRules;
 import com.grihail.modernposes.combat.Combat;
 import com.grihail.modernposes.hands.HandUse;
 import com.grihail.modernposes.hands.Hands;
@@ -30,6 +33,17 @@ public abstract class MixinEntityPlayer {
     private void modernposes$attackSpeed(CallbackInfo ci) {
         ((EntityPlayer) (Object) this).getAttributeMap()
             .registerAttribute(Combat.ATTACK_SPEED);
+    }
+
+    /** 26.3's armor for a player; Forge's method has 1.7.10's formula inside. */
+    @Redirect(
+        method = "damageEntity",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraftforge/common/ISpecialArmor$ArmorProperties;ApplyArmor(Lnet/minecraft/entity/EntityLivingBase;[Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/DamageSource;D)F",
+            remap = false))
+    private float modernposes$armor(EntityLivingBase self, ItemStack[] armor, DamageSource source, double damage) {
+        return ArmorRules.applyPlayer(self, armor, source, damage);
     }
 
     /** 26.3's attack instead of 1.7.10's. */

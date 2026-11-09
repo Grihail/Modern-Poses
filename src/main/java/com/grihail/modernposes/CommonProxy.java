@@ -14,6 +14,8 @@ public class CommonProxy {
 
     public void preInit(FMLPreInitializationEvent event) {
         PoseNet.init();
+        com.grihail.modernposes.combat.EnchantmentSweeping.register();
+        com.grihail.modernposes.combat.Combat.registerPotions();
     }
 
     public void init(FMLInitializationEvent event) {

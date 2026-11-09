@@ -17,7 +17,9 @@
     "MixinItem",
     "MixinItemSword",
     "MixinItemTool",
-    "AccessorItemHoe"
+    "AccessorItemHoe",
+    "MixinEnchantmentDamage",
+    "MixinPotionAttackDamage"
   ],
   "client": [
     "client.MixinEffectRenderer",
