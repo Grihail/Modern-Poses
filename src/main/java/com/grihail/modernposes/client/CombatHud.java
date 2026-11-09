@@ -45,10 +45,11 @@ public final class CombatHud {
             return;
         }
         int width = e.resolution.getScaledWidth(), height = e.resolution.getScaledHeight();
-        if (e.type == RenderGameOverlayEvent.ElementType.CROSSHAIRS && "crosshair".equals(CombatConfig.attackIndicator)) {
+        if (e.type == RenderGameOverlayEvent.ElementType.CROSSHAIRS
+            && "crosshair".equals(CombatConfig.attackIndicator)) {
             crosshair(mc, width, height);
-        } else if (e.type == RenderGameOverlayEvent.ElementType.HOTBAR
-            && "hotbar".equals(CombatConfig.attackIndicator)) {
+        } else
+            if (e.type == RenderGameOverlayEvent.ElementType.HOTBAR && "hotbar".equals(CombatConfig.attackIndicator)) {
                 hotbar(mc, width, height);
             }
     }
@@ -93,7 +94,8 @@ public final class CombatHud {
             .bindTexture(Gui.icons);
     }
 
-    private static void blit(Minecraft mc, ResourceLocation tex, int x, int y, int v, int w, int h, int texW, int texH) {
+    private static void blit(Minecraft mc, ResourceLocation tex, int x, int y, int v, int w, int h, int texW,
+        int texH) {
         mc.getTextureManager()
             .bindTexture(tex);
         Gui.func_146110_a(x, y, 0.0F, v, w, h, texW, texH);
@@ -115,13 +117,17 @@ public final class CombatHud {
     private static void weapon(ItemStack stack, List<String> tip, EntityPlayer p) {
         String speedKey = Combat.ATTACK_SPEED.getAttributeUnlocalizedName();
         String damageKey = SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName();
-        AttributeModifier speed = find(stack.getAttributeModifiers()
-            .get(speedKey), Combat.SPEED_MODIFIER);
+        AttributeModifier speed = find(
+            stack.getAttributeModifiers()
+                .get(speedKey),
+            Combat.SPEED_MODIFIER);
         if (speed == null) {
             return;
         }
-        AttributeModifier damage = find(stack.getAttributeModifiers()
-            .get(damageKey), Combat.DAMAGE_MODIFIER);
+        AttributeModifier damage = find(
+            stack.getAttributeModifiers()
+                .get(damageKey),
+            Combat.DAMAGE_MODIFIER);
         int at = removeVanilla(tip, damageKey, damage);
         int speedAt = removeVanilla(tip, speedKey, speed);
         at = at < 0 ? speedAt : (speedAt < 0 ? at : Math.min(at, speedAt));
@@ -132,8 +138,12 @@ public final class CombatHud {
         double baseDamage = p.getEntityAttribute(SharedMonsterAttributes.attackDamage)
             .getBaseValue();
         tip.add(at++, line(baseDamage + (damage == null ? 0.0D : damage.getAmount()), damageKey));
-        tip.add(at, line(p.getEntityAttribute(Combat.ATTACK_SPEED)
-            .getBaseValue() + speed.getAmount(), speedKey));
+        tip.add(
+            at,
+            line(
+                p.getEntityAttribute(Combat.ATTACK_SPEED)
+                    .getBaseValue() + speed.getAmount(),
+                speedKey));
     }
 
     private static AttributeModifier find(Collection<?> modifiers, java.util.UUID id) {
@@ -151,10 +161,11 @@ public final class CombatHud {
             return -1;
         }
         boolean plus = m.getAmount() > 0.0D;
-        String line = (plus ? EnumChatFormatting.BLUE : EnumChatFormatting.RED) + StatCollector.translateToLocalFormatted(
-            "attribute.modifier." + (plus ? "plus" : "take") + ".0",
-            ItemStack.field_111284_a.format(Math.abs(m.getAmount())),
-            StatCollector.translateToLocal("attribute.name." + key));
+        String line = (plus ? EnumChatFormatting.BLUE : EnumChatFormatting.RED)
+            + StatCollector.translateToLocalFormatted(
+                "attribute.modifier." + (plus ? "plus" : "take") + ".0",
+                ItemStack.field_111284_a.format(Math.abs(m.getAmount())),
+                StatCollector.translateToLocal("attribute.name." + key));
         int at = tip.indexOf(line);
         if (at >= 0) {
             tip.remove(at);
@@ -182,16 +193,19 @@ public final class CombatHud {
             return;
         }
         tip.add("");
+        tip.add(EnumChatFormatting.GRAY + StatCollector.translateToLocal("item.modifiers." + SLOTS[armor.armorType]));
         tip.add(
-            EnumChatFormatting.GRAY + StatCollector.translateToLocal("item.modifiers." + SLOTS[armor.armorType]));
-        tip.add(EnumChatFormatting.BLUE + "+" + armor.damageReduceAmount
-            + " "
-            + StatCollector.translateToLocal("attribute.name.generic.armor"));
+            EnumChatFormatting.BLUE + "+"
+                + armor.damageReduceAmount
+                + " "
+                + StatCollector.translateToLocal("attribute.name.generic.armor"));
         float tough = ArmorRules.toughness(stack);
         if (tough > 0.0F) {
-            tip.add(EnumChatFormatting.BLUE + "+" + ItemStack.field_111284_a.format(tough)
-                + " "
-                + StatCollector.translateToLocal("attribute.name.generic.armorToughness"));
+            tip.add(
+                EnumChatFormatting.BLUE + "+"
+                    + ItemStack.field_111284_a.format(tough)
+                    + " "
+                    + StatCollector.translateToLocal("attribute.name.generic.armorToughness"));
         }
     }
 }

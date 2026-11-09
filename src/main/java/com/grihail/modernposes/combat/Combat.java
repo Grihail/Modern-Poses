@@ -182,7 +182,13 @@ public final class Combat {
             float dealt = oldHealth - living.getHealth();
             self.addStat(StatList.damageDealtStat, Math.round(dealt * 10.0F));
             if (dealt > 2.0F) {
-                fx(self, SCombatFx.DAMAGE, target.posX, target.posY + target.height * 0.5D, target.posZ, (int) (dealt * 0.5D));
+                fx(
+                    self,
+                    SCombatFx.DAMAGE,
+                    target.posX,
+                    target.posY + target.height * 0.5D,
+                    target.posZ,
+                    (int) (dealt * 0.5D));
             }
         }
         self.addExhaustion(0.1F);

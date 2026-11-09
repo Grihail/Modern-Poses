@@ -37,7 +37,8 @@ public abstract class MixinEnchantmentDamage {
         if (this.damageType == 2 && target instanceof EntityLivingBase
             && ((EntityLivingBase) target).getCreatureAttribute() == EnumCreatureAttribute.ARTHROPOD) {
             float seconds = 1.5F + attacker.getRNG()
-                .nextFloat() * 0.5F * (level - 1);
+                .nextFloat() * 0.5F
+                * (level - 1);
             ((EntityLivingBase) target)
                 .addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, Math.round(seconds * 20.0F), 3));
         }
