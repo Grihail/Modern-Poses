@@ -13,7 +13,11 @@
     "AccessorEntityPlayer",
     "MixinContainerPlayer",
     "MixinInventoryPlayer",
-    "MixinEntityLivingBase"
+    "MixinEntityLivingBase",
+    "MixinItem",
+    "MixinItemSword",
+    "MixinItemTool",
+    "AccessorItemHoe"
   ],
   "client": [
     "client.MixinEffectRenderer",
