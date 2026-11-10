@@ -12,20 +12,16 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.grihail.modernposes.client.CombatClient;
 import com.grihail.modernposes.client.HandClient;
 import com.grihail.modernposes.hands.Hands;
 import com.grihail.modernposes.hands.OffhandSlot;
 
-/** The right click for each hand; the left click is the main hand's. */
+/** Feature offhand: the right click for each hand; the left click is the main hand's. */
 @Mixin(Minecraft.class)
-public abstract class MixinMinecraft {
+public abstract class MixinMinecraftOffhand {
 
     @Shadow
     public EntityClientPlayerMP thePlayer;
-
-    @Shadow
-    private int leftClickCounter;
 
     @Shadow
     private void func_147121_ag() {}
@@ -50,7 +46,6 @@ public abstract class MixinMinecraft {
     private void modernposes$leftClick(CallbackInfo ci) {
         if (this.thePlayer != null) {
             Hands.of(this.thePlayer).swingOff = false;
-            CombatClient.leftClick((Minecraft) (Object) this, this.thePlayer, this.leftClickCounter);
         }
     }
 }

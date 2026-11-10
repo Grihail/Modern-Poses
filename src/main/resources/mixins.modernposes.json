@@ -21,7 +21,14 @@
     "MixinEnchantmentDamage",
     "MixinPotionAttackDamage",
     "MixinFoodStats",
-    "MixinItemAppleGold"
+    "MixinItemAppleGold",
+    "MixinEntityPlayerCombat",
+    "MixinEntityPlayerArmor",
+    "MixinEntityPlayerOffhand",
+    "MixinEntityLivingBaseArmor",
+    "MixinEntityLivingBaseCombat",
+    "MixinItemSwordBlocking",
+    "MixinNetHandlerPlayServerOffhand"
   ],
   "client": [
     "client.MixinEffectRenderer",
@@ -33,10 +40,16 @@
     "client.MixinRenderPlayer",
     "client.AccessorItemRenderer",
     "client.MixinItemRenderer",
-    "client.MixinMinecraft",
     "client.MixinEntityOtherPlayerMP",
     "client.MixinGuiInventory",
-    "client.MixinGuiContainerCreative"
+    "client.MixinGuiContainerCreative",
+    "client.MixinMinecraftOffhand",
+    "client.MixinMinecraftCombat",
+    "client.MixinPlayerControllerMPCombat",
+    "client.MixinPlayerControllerMPOffhand",
+    "client.MixinItemRendererOffhand",
+    "client.MixinItemRendererCombat",
+    "client.MixinNetHandlerPlayClientOffhand"
   ],
   "server": []
 }
