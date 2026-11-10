@@ -25,6 +25,14 @@ public final class ModernHands {
 
     private ModernHands() {}
 
+    /**
+     * The off hand is on in the config. When off, {@link #getOffhand} is always null and {@link #setOffhand} does
+     * nothing.
+     */
+    public static boolean offhandEnabled() {
+        return Features.offhand;
+    }
+
     /** What the off hand holds, or null. */
     public static ItemStack getOffhand(EntityPlayer p) {
         return Hands.of(p)

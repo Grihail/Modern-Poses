@@ -8,3 +8,4 @@ item.modifiers.feet=Когда обуто:
 attribute.name.generic.attackSpeed=Скорость атаки
 attribute.name.generic.armor=Броня
 attribute.name.generic.armorToughness=Твёрдость брони
+modernposes.config.mismatch=Modern Poses: на сервере другие настройки %s. Используйте такой же config/modernposes.cfg, как на сервере, иначе часть функций не будет работать.

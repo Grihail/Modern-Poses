@@ -8,3 +8,4 @@ item.modifiers.feet=When on Feet:
 attribute.name.generic.attackSpeed=Attack Speed
 attribute.name.generic.armor=Armor
 attribute.name.generic.armorToughness=Armor Toughness
+modernposes.config.mismatch=Modern Poses: this server has other settings for %s. Use the same config/modernposes.cfg as the server, or some things will not work.

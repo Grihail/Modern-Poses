@@ -20,7 +20,25 @@ public final class Features {
     public static boolean attackCooldown = true, weaponStats = true, noSwordBlocking = true, armor = true,
         enchantments = true, potions = true, food = true;
 
+    /** The config keys, in the order of {@link #mask}'s bits. */
+    public static final String[] NAMES = { "poses.sneaking", "poses.swimming", "poses.crawling", "hands.offhand",
+        "combat.attackCooldown", "combat.weaponStats", "combat.noSwordBlocking", "combat.armor", "combat.enchantments",
+        "combat.potions", "combat.food" };
+
     private Features() {}
+
+    /** The features as bits, to compare a client's with its server's. */
+    public static int mask() {
+        boolean[] on = { sneaking, swimming, crawling, offhand, attackCooldown, weaponStats, noSwordBlocking, armor,
+            enchantments, potions, food };
+        int m = 0;
+        for (int i = 0; i < on.length; i++) {
+            if (on[i]) {
+                m |= 1 << i;
+            }
+        }
+        return m;
+    }
 
     /** The feature a mixin belongs to is on (the names MixinPlugin maps the mixins to). */
     static boolean isOn(String feature) {

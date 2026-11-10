@@ -25,6 +25,7 @@ public class CommonProxy {
 
     public void init(FMLInitializationEvent event) {
         register(new ServerPoses());
+        register(new com.grihail.modernposes.net.SFeatures.Events());
         register(new com.grihail.modernposes.hands.HandsServer());
         if (Features.attackCooldown) {
             register(new com.grihail.modernposes.combat.Combat());
@@ -47,6 +48,9 @@ public class CommonProxy {
     public boolean handleMovement(EntityPlayer p, float strafe, float forward) {
         return false;
     }
+
+    /** Client: the server said which features it has; warn about the ones this client has otherwise. */
+    public void checkFeatures(int serverMask) {}
 
     /** Called from the netty thread for server-to-client messages; the client proxy queues it for the main thread. */
     public void runOnClient(Runnable r) {}

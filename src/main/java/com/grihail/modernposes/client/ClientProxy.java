@@ -29,6 +29,28 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
+    public void checkFeatures(int serverMask) {
+        int differ = serverMask ^ com.grihail.modernposes.Features.mask();
+        if (differ == 0) {
+            return;
+        }
+        StringBuilder names = new StringBuilder();
+        for (int i = 0; i < com.grihail.modernposes.Features.NAMES.length; i++) {
+            if ((differ & 1 << i) != 0) {
+                names.append(names.length() == 0 ? "" : ", ")
+                    .append(com.grihail.modernposes.Features.NAMES[i]);
+            }
+        }
+        net.minecraft.util.ChatComponentTranslation msg = new net.minecraft.util.ChatComponentTranslation(
+            "modernposes.config.mismatch",
+            names.toString());
+        msg.getChatStyle()
+            .setColor(net.minecraft.util.EnumChatFormatting.YELLOW);
+        net.minecraft.client.Minecraft.getMinecraft().ingameGUI.getChatGUI()
+            .printChatMessage(msg);
+    }
+
+    @Override
     public boolean isLocalPlayer(EntityPlayer p) {
         return p instanceof EntityPlayerSP;
     }

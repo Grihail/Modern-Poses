@@ -3,6 +3,7 @@ package com.grihail.modernposes.api;
 import net.minecraft.entity.ai.attributes.IAttribute;
 import net.minecraft.entity.player.EntityPlayer;
 
+import com.grihail.modernposes.Features;
 import com.grihail.modernposes.combat.Combat;
 
 /** 26.3's attack charge, for any mod. */
@@ -21,6 +22,14 @@ public final class ModernCombat {
     /** Ticks a full charge takes with what the player holds. */
     public static float attackDelay(EntityPlayer player) {
         return Combat.delay(player);
+    }
+
+    /**
+     * The attack charge is on in the config (attackCooldown). When off, {@link #attackStrength} is always 1 and the
+     * players have no {@link #ATTACK_SPEED} attribute.
+     */
+    public static boolean attackCooldownEnabled() {
+        return Features.attackCooldown;
     }
 
     /** Starts the charge over (Player.resetAttackStrengthTicker). */
