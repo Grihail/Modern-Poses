@@ -18,7 +18,15 @@ compileOnly(files("libs/modern-poses-1.3.1-api.jar"))
 
 The mod id is `modernposes`. It needs UniMixins, and must be installed on both client and server.
 
-`ModernCombat`, `WeaponItem` and `ToughArmor` need 1.3.1 or later.
+`ModernCombat`, `WeaponItem` and `ToughArmor` need 1.3.1 or later. `ModernHands.offhandEnabled` and
+`ModernCombat.attackCooldownEnabled` are newer than 1.3.1.
+
+Players can turn parts of the mod off in `config/modernposes.cfg`, so don't assume every feature is there:
+
+- Check `ModernHands.offhandEnabled()` and `ModernCombat.attackCooldownEnabled()` before relying on the off hand or the
+  attack charge.
+- A turned-off `sneak`, `swim` or `crawl` pose is removed from every `PoseSet`, yours included, so `posesOf` doesn't
+  return it. `fall_flying` and poses with other names are kept.
 
 Register providers, triggers and held models during `init`.
 
@@ -94,6 +102,7 @@ the off hand the left.
 
 | `ModernHands` method | Purpose |
 |---|---|
+| `offhandEnabled()` | Whether the off hand is on in the config. When off, `getOffhand` returns `null` and `setOffhand` does nothing. |
 | `getOffhand(p)` / `setOffhand(p, stack)` | Off hand stack. Set it on the server. |
 | `getHeld(p, hand)` / `setHeld(p, hand, stack)` | Stack in either hand. |
 | `usedHand(p)` | Hand using an item, or `null`. |
@@ -166,6 +175,7 @@ Melee follows 26.3: attacks charge, and damage scales with the charge. `AttackEn
 
 | `ModernCombat` | Purpose |
 |---|---|
+| `attackCooldownEnabled()` | Whether the attack charge is on in the config. When off, `attackStrength` is always 1 and players have no `ATTACK_SPEED`. |
 | `attackStrength(p, partial)` | Charge of the next attack, 0..1. |
 | `attackDelay(p)` | Ticks a full charge takes with the held item. |
 | `resetAttack(p)` | Restart the charge. |
