@@ -118,6 +118,6 @@ public final class HandsServer {
         Hands.of(e.entityPlayer)
             .set(
                 Hands.of(e.original)
-                    .get());
+                    .raw());
     }
 }

@@ -83,6 +83,8 @@ public final class Sizes {
      */
     public static void beforeMove(EntityPlayer p) {
         if (!p.worldObj.isRemote || !ModernPosesMod.proxy.isLocalPlayer(p) || !hasPose(p)) return;
+        // 1.7.10's sneaking (the feature off) lowers the camera by ySize, unless that would put the eye too low
+        if (!Features.sneaking && PoseState.get(p).pose.eye - 0.2F > PoseSize.MIN_EYE + 0.05F) return;
         if (p.ySize != 0) {
             p.ySize = 0;
             p.posY = p.boundingBox.minY + p.yOffset;

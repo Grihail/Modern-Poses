@@ -8,6 +8,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IExtendedEntityProperties;
 
+import com.grihail.modernposes.Features;
+
 /**
  * The off hand of a player: the one slot's stack (saved with the player) and what its use and swing are doing. The
  * other players' clients get the stack and the state from the server (HandsServer).
@@ -47,7 +49,13 @@ public final class Hands implements IExtendedEntityProperties, IInventory {
         return h;
     }
 
+    /** Null while the off hand is off in the config (an item it held stays saved, see {@link #raw}). */
     public ItemStack get() {
+        return Features.offhand ? this.stack : null;
+    }
+
+    /** What is stored, whether or not the off hand is on. */
+    public ItemStack raw() {
         return this.stack;
     }
 

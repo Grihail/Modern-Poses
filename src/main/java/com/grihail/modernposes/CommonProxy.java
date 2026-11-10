@@ -13,16 +13,22 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 public class CommonProxy {
 
     public void preInit(FMLPreInitializationEvent event) {
-        com.grihail.modernposes.combat.CombatConfig.load(event.getSuggestedConfigurationFile());
+        Config.load(event.getSuggestedConfigurationFile());
         PoseNet.init();
-        com.grihail.modernposes.combat.EnchantmentSweeping.register();
-        com.grihail.modernposes.combat.Combat.registerPotions();
+        if (Features.enchantments && Features.attackCooldown) {
+            com.grihail.modernposes.combat.EnchantmentSweeping.register();
+        }
+        if (Features.potions) {
+            com.grihail.modernposes.combat.Combat.registerPotions();
+        }
     }
 
     public void init(FMLInitializationEvent event) {
         register(new ServerPoses());
         register(new com.grihail.modernposes.hands.HandsServer());
-        register(new com.grihail.modernposes.combat.Combat());
+        if (Features.attackCooldown) {
+            register(new com.grihail.modernposes.combat.Combat());
+        }
     }
 
     protected static void register(Object events) {

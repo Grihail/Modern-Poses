@@ -20,9 +20,10 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 
 import org.lwjgl.opengl.GL11;
 
+import com.grihail.modernposes.Config;
+import com.grihail.modernposes.Features;
 import com.grihail.modernposes.combat.ArmorRules;
 import com.grihail.modernposes.combat.Combat;
-import com.grihail.modernposes.combat.CombatConfig;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
@@ -41,17 +42,15 @@ public final class CombatHud {
     @SubscribeEvent
     public void onOverlay(RenderGameOverlayEvent.Post e) {
         Minecraft mc = Minecraft.getMinecraft();
-        if (mc.thePlayer == null) {
+        if (mc.thePlayer == null || !Features.attackCooldown) {
             return;
         }
         int width = e.resolution.getScaledWidth(), height = e.resolution.getScaledHeight();
-        if (e.type == RenderGameOverlayEvent.ElementType.CROSSHAIRS
-            && "crosshair".equals(CombatConfig.attackIndicator)) {
+        if (e.type == RenderGameOverlayEvent.ElementType.CROSSHAIRS && "crosshair".equals(Config.attackIndicator)) {
             crosshair(mc, width, height);
-        } else
-            if (e.type == RenderGameOverlayEvent.ElementType.HOTBAR && "hotbar".equals(CombatConfig.attackIndicator)) {
-                hotbar(mc, width, height);
-            }
+        } else if (e.type == RenderGameOverlayEvent.ElementType.HOTBAR && "hotbar".equals(Config.attackIndicator)) {
+            hotbar(mc, width, height);
+        }
     }
 
     private static void crosshair(Minecraft mc, int width, int height) {
@@ -109,7 +108,9 @@ public final class CombatHud {
             return;
         }
         weapon(e.itemStack, e.toolTip, e.entityPlayer);
-        armor(e.itemStack, e.toolTip);
+        if (Features.armor) {
+            armor(e.itemStack, e.toolTip);
+        }
     }
 
     /** 1.7.10's "+6 Attack Damage" becomes 26.3's " 7 Attack Damage" under "When in Main Hand:". */

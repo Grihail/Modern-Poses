@@ -9,6 +9,7 @@ import net.minecraft.item.ItemSpade;
 import net.minecraft.item.ItemTool;
 
 import com.google.common.collect.Multimap;
+import com.grihail.modernposes.Features;
 
 /** 26.3's Items table: what weapons and tools add to the player's damage of 1 and attack speed of 4. */
 public final class WeaponStats {
@@ -49,6 +50,9 @@ public final class WeaponStats {
     }
 
     public static void speed(Multimap modifiers, double speed) {
+        if (!Features.attackCooldown) {
+            return; // no charge, no attack speed
+        }
         modifiers.removeAll(SPEED);
         modifiers.put(SPEED, new AttributeModifier(Combat.SPEED_MODIFIER, "Weapon modifier", speed, 0));
     }

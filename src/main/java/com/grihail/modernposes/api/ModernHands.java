@@ -8,6 +8,7 @@ import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
+import com.grihail.modernposes.Features;
 import com.grihail.modernposes.hands.Hands;
 
 /**
@@ -32,8 +33,10 @@ public final class ModernHands {
 
     /** Server: puts a stack in the off hand; it reaches the clients by itself. */
     public static void setOffhand(EntityPlayer p, ItemStack stack) {
-        Hands.of(p)
-            .set(stack);
+        if (Features.offhand) {
+            Hands.of(p)
+                .set(stack);
+        }
     }
 
     /** What a hand holds, or null. */

@@ -26,6 +26,7 @@ import net.minecraft.util.MathHelper;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 
+import com.grihail.modernposes.Features;
 import com.grihail.modernposes.api.WeaponItem;
 import com.grihail.modernposes.net.PoseNet;
 import com.grihail.modernposes.net.SCombatFx;
@@ -60,17 +61,26 @@ public final class Combat {
 
     /** Player.getCurrentItemAttackStrengthDelay: ticks a full charge takes. */
     public static float delay(EntityPlayer p) {
+        if (!Features.attackCooldown) {
+            return 0.0F;
+        }
         IAttributeInstance speed = p.getEntityAttribute(ATTACK_SPEED);
         return (float) (1.0D / (speed == null ? 4.0D : speed.getAttributeValue()) * 20.0D);
     }
 
     /** Player.getAttackStrengthScale. */
     public static float strength(EntityPlayer p, float partial) {
+        if (!Features.attackCooldown) {
+            return 1.0F;
+        }
         return MathHelper.clamp_float((AttackState.of(p).strengthTicker + partial) / delay(p), 0.0F, 1.0F);
     }
 
     /** Player.getItemSwapScale. */
     public static float swapScale(EntityPlayer p, float partial) {
+        if (!Features.attackCooldown) {
+            return 1.0F;
+        }
         return MathHelper.clamp_float((AttackState.of(p).swapTicker + partial) / delay(p), 0.0F, 1.0F);
     }
 

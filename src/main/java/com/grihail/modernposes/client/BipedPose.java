@@ -13,6 +13,7 @@ import net.minecraft.util.Vec3;
 
 import org.lwjgl.opengl.GL11;
 
+import com.grihail.modernposes.Features;
 import com.grihail.modernposes.PoseState;
 import com.grihail.modernposes.api.ArmAngles;
 import com.grihail.modernposes.api.ArmPose;
@@ -189,11 +190,12 @@ public final class BipedPose {
 
     /** Players whose sneak model is drawn by {@link #sneak} (on the ground, no vanilla 0.125 lowering). */
     public static boolean groundedSneak(EntityPlayer p) {
-        return PoseState.get(p) != null;
+        return Features.sneaking && PoseState.get(p) != null;
     }
 
     /** Every value it touches is set every frame (vanilla does not reset the arm and body pivots itself). */
     private static void sneak(ModelBiped m) {
+        if (!Features.sneaking) return; // 1.7.10's sneak model, as vanilla set it
         float[] base = BASE.get(m);
         if (base == null) { // vanilla never moves these, so this is the model's own rest value
             base = new float[] { m.bipedBody.rotationPointY, m.bipedRightArm.rotationPointY,

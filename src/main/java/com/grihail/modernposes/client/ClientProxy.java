@@ -7,6 +7,7 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
 
 import com.grihail.modernposes.CommonProxy;
+import com.grihail.modernposes.Features;
 
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 
@@ -22,7 +23,9 @@ public class ClientProxy extends CommonProxy {
         register(new ClientEvents());
         register(new HandClient());
         register(new CombatHud());
-        cpw.mods.fml.client.registry.ClientRegistry.registerKeyBinding(HandClient.SWAP);
+        if (Features.offhand) {
+            cpw.mods.fml.client.registry.ClientRegistry.registerKeyBinding(HandClient.SWAP);
+        }
     }
 
     @Override

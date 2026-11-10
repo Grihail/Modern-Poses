@@ -7,6 +7,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 
+import com.grihail.modernposes.PoseFilter;
 import com.grihail.modernposes.PoseState;
 import com.grihail.modernposes.Sizes;
 import com.grihail.modernposes.server.ServerPoses;
@@ -46,9 +47,9 @@ public final class ModernPoses {
     public static PoseSet posesOf(EntityPlayer p) {
         for (PoseProvider pr : PROVIDERS) {
             PoseSet s = pr.posesFor(p);
-            if (s != null) return s;
+            if (s != null) return PoseFilter.apply(s);
         }
-        return PoseSet.VANILLA;
+        return PoseFilter.apply(PoseSet.VANILLA);
     }
 
     /**

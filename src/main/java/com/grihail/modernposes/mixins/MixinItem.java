@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.google.common.collect.Multimap;
+import com.grihail.modernposes.Features;
 import com.grihail.modernposes.api.WeaponItem;
 import com.grihail.modernposes.combat.WeaponStats;
 
@@ -23,7 +24,7 @@ public abstract class MixinItem {
         Object self = this;
         if (self instanceof WeaponItem) {
             WeaponStats.speed(cir.getReturnValue(), ((WeaponItem) self).attackSpeedModifier());
-        } else if (self instanceof ItemHoe) {
+        } else if (self instanceof ItemHoe && Features.weaponStats) {
             WeaponStats.hoe(cir.getReturnValue(), ((AccessorItemHoe) self).modernposes$getMaterial());
         }
     }
@@ -32,7 +33,7 @@ public abstract class MixinItem {
     @Inject(method = "hitEntity", at = @At("RETURN"), cancellable = true)
     private void modernposes$hoeHit(ItemStack stack, EntityLivingBase target, EntityLivingBase attacker,
         CallbackInfoReturnable<Boolean> cir) {
-        if ((Object) this instanceof ItemHoe) {
+        if ((Object) this instanceof ItemHoe && Features.weaponStats) {
             stack.damageItem(2, attacker);
             cir.setReturnValue(true);
         }
