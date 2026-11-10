@@ -9,17 +9,16 @@ Build against the API jar and require the mod at runtime:
 
 ```groovy
 // dependencies.gradle
-compileOnly(files("libs/modern-poses-1.3.0-api.jar"))
+compileOnly(files("libs/modern-poses-1.3.1-api.jar"))
 ```
 
 ```java
-@Mod(modid = "yourmod", dependencies = "required-after:modernposes")
+@Mod(modid = "yourmod", dependencies = "required-after:modernposes@[1.3.1,)")
 ```
 
 The mod id is `modernposes`. It needs UniMixins, and must be installed on both client and server.
 
-`ModernCombat`, `WeaponItem` and `ToughArmor` were added after the `1.3.0` tag, so a version check against `1.3.0` does
-not guarantee them.
+`ModernCombat`, `WeaponItem` and `ToughArmor` need 1.3.1 or later.
 
 Register providers, triggers and held models during `init`.
 
